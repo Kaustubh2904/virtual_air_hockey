@@ -4,10 +4,10 @@ import numpy as np
 from datetime import datetime
 
 # Constants
-WIDTH, HEIGHT = 1280, 720
-MALLET_RADIUS = 30
-PUCK_RADIUS = 20
-SPEED_LIMIT = 15
+WIDTH, HEIGHT = 1280, 768
+MALLET_RADIUS = 35 # Increased mallet size for better collision detection
+PUCK_RADIUS = 25 # Increased puck size for better collision detection
+SPEED_LIMIT = 30   # Increased speed limit for faster gameplay
 GOAL_SIZE = 200
 DURATION = 120
 
@@ -17,6 +17,7 @@ BLUE = (255, 0, 0)
 WHITE = (255, 255, 255)
 GREEN = (0, 255, 0)
 YELLOW = (0, 255, 255)
+BLACK = (0, 0, 0)
 
 # Initialize MediaPipe Hands
 mp_hands = mp.solutions.hands
@@ -188,9 +189,17 @@ while True:
         mallet_vel_player1 = (mallet_pos_player1 - prev_mallet_pos_player1)
         mallet_vel_player2 = (mallet_pos_player2 - prev_mallet_pos_player2)
 
-        # Draw mallets
-        cv2.circle(frame, tuple(mallet_pos_player1.astype(int)), MALLET_RADIUS, RED, 5)
-        cv2.circle(frame, tuple(mallet_pos_player2.astype(int)), MALLET_RADIUS, BLUE, 5)
+        # Draw square mallets
+        x1, y1 = mallet_pos_player1.astype(int)
+        x2, y2 = mallet_pos_player2.astype(int)
+        cv2.rectangle(frame,
+                     (x1 - MALLET_RADIUS, y1 - MALLET_RADIUS),
+                     (x1 + MALLET_RADIUS, y1 + MALLET_RADIUS),
+                     RED, 5)
+        cv2.rectangle(frame,
+                     (x2 - MALLET_RADIUS, y2 - MALLET_RADIUS),
+                     (x2 + MALLET_RADIUS, y2 + MALLET_RADIUS),
+                     BLUE, 5)
 
         # Check collisions and update physics
         check_collision(mallet_pos_player1, mallet_vel_player1)
@@ -198,7 +207,7 @@ while True:
         update_puck()
 
     # Draw game elements
-    cv2.circle(frame, tuple(puck_pos.astype(int)), PUCK_RADIUS, WHITE, 5)
+    cv2.circle(frame, tuple(puck_pos.astype(int)), PUCK_RADIUS, BLACK, 5)
     cv2.rectangle(frame, (0, (HEIGHT // 2) - (GOAL_SIZE // 2)), (10, (HEIGHT // 2) + (GOAL_SIZE // 2)), WHITE, 20)
     cv2.rectangle(frame, (WIDTH - 10, (HEIGHT // 2) - (GOAL_SIZE // 2)), (WIDTH, (HEIGHT // 2) + (GOAL_SIZE // 2)), WHITE, 20)
     cv2.line(frame, (WIDTH // 2, 0), (WIDTH // 2, HEIGHT), GREEN, 5)
@@ -221,7 +230,7 @@ while True:
     key = cv2.waitKey(1) & 0xFF
     if key == ord('q'):
         break
-    elif key == ord('n') and game_over:
+    if key == ord('n'):
         game_over = False
         score_player1, score_player2 = 0, 0
         start_time = datetime.now()
@@ -229,4 +238,3 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-

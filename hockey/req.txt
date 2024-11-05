@@ -1,0 +1,7 @@
+after activating virtual env navigate to this
+
+.\.venv\Scripts\activate
+
+after activating virtual env run this command
+
+uv pip install mediapipe numpy opencv-python4.8.0.74
